@@ -1,7 +1,7 @@
 /* ==========================================================================
    STYLE.CSS - Qui Veut Gagner des Millions ?
    Look & feel inspiré du jeu télévisé : scène bleu nuit/violet, projecteurs,
-   hexagones dorés et bleus, échelle des gains lumineuse.
+   hexagones dorés et bleus, chronomètre, écran des gains, animations.
    ========================================================================== */
 
 /* --- Variables de couleurs et mise en page --- */
@@ -54,6 +54,10 @@ button {
   font-family: inherit;
 }
 
+.hidden {
+  display: none !important;
+}
+
 /* --- Fond de scène et projecteurs --- */
 .stage-background {
   position: fixed;
@@ -64,7 +68,7 @@ button {
   overflow: hidden;
 }
 
-/* Faisceaux de lumière (projecteurs de studio) */
+/* Faisceaux de lumière (projecteurs de studio) qui balaient la scène */
 .spotlight {
   position: absolute;
   top: -100px;
@@ -78,11 +82,23 @@ button {
 .spotlight-left {
   left: 10%;
   transform: rotate(25deg);
+  animation: sweepLeft 8s ease-in-out infinite alternate;
 }
 
 .spotlight-right {
   right: 10%;
   transform: rotate(-25deg);
+  animation: sweepRight 9s ease-in-out infinite alternate;
+}
+
+@keyframes sweepLeft {
+  from { transform: rotate(14deg); }
+  to   { transform: rotate(38deg); }
+}
+
+@keyframes sweepRight {
+  from { transform: rotate(-14deg); }
+  to   { transform: rotate(-38deg); }
 }
 
 .stage-glow {
@@ -96,6 +112,28 @@ button {
   background: radial-gradient(ellipse at center, rgba(30, 75, 200, 0.28) 0%, rgba(18, 12, 60, 0.1) 70%, transparent 100%);
   border-radius: 50%;
   filter: blur(30px);
+  animation: glowBreath 5s ease-in-out infinite alternate;
+}
+
+@keyframes glowBreath {
+  from { opacity: 0.6; }
+  to   { opacity: 1; }
+}
+
+/* Petites étoiles scintillantes (générées en JS) */
+.sparkle {
+  position: absolute;
+  border-radius: 50%;
+  background: #fff;
+  opacity: 0;
+  box-shadow: 0 0 8px 2px rgba(255, 242, 168, 0.7);
+  animation: twinkle var(--dur, 4s) ease-in-out infinite;
+  animation-delay: var(--delay, 0s);
+}
+
+@keyframes twinkle {
+  0%, 100% { opacity: 0; transform: translateY(0) scale(0.6); }
+  50%      { opacity: 0.9; transform: translateY(-18px) scale(1.2); }
 }
 
 /* --- Conteneur principal de l'application --- */
@@ -105,10 +143,17 @@ button {
   width: 100%;
   max-width: 1200px;
   min-height: 100vh;
+  min-height: 100dvh;
   margin: 0 auto;
   padding: 16px;
   display: flex;
   flex-direction: column;
+}
+
+/* Mode plein écran pendant la partie */
+body.in-game .app-container {
+  max-width: none;
+  padding: 12px clamp(12px, 3vw, 44px) 16px;
 }
 
 /* --- Gestion des écrans (Start / Game / End) --- */
@@ -117,7 +162,7 @@ button {
   width: 100%;
   flex: 1;
   flex-direction: column;
-  animation: fadeIn 0.35s ease-out forwards;
+  animation: fadeIn 0.35s ease-out;
 }
 
 .screen.active {
@@ -126,7 +171,7 @@ button {
 
 @keyframes fadeIn {
   from { opacity: 0; transform: translateY(8px); }
-  to { opacity: 1; transform: translateY(0); }
+  to   { opacity: 1; transform: translateY(0); }
 }
 
 /* ==========================================================================
@@ -147,6 +192,84 @@ button {
   width: 100%;
 }
 
+/* Barre d'outils : traduction + son */
+.start-toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-bottom: 22px;
+  padding: 8px 14px;
+  background: rgba(10, 15, 45, 0.6);
+  border: 1px solid rgba(212, 175, 55, 0.3);
+  border-radius: 40px;
+  backdrop-filter: blur(8px);
+}
+
+.lang-label {
+  font-size: 0.85rem;
+  color: #cbd5e1;
+  font-weight: 600;
+}
+
+.lang-switch {
+  display: flex;
+  gap: 6px;
+}
+
+.lang-btn {
+  background: transparent;
+  color: var(--text-gold);
+  border: 1.5px solid rgba(212, 175, 55, 0.5);
+  border-radius: 20px;
+  padding: 6px 14px;
+  font-size: 0.9rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.lang-btn:hover {
+  background: rgba(212, 175, 55, 0.15);
+  transform: translateY(-1px);
+}
+
+.lang-btn.active {
+  background: linear-gradient(180deg, #e5b329 0%, #b8860b 100%);
+  color: #0b0f24;
+  border-color: #fff2a8;
+  box-shadow: 0 0 12px rgba(212, 175, 55, 0.5);
+}
+
+/* Bouton son */
+.sound-toggle {
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  border: 1.5px solid rgba(212, 175, 55, 0.6);
+  background: rgba(10, 15, 45, 0.8);
+  color: #fff;
+  font-size: 1.1rem;
+  line-height: 1;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  transition: transform 0.15s ease, box-shadow 0.2s ease;
+}
+
+.sound-toggle:hover {
+  transform: scale(1.1);
+  box-shadow: 0 0 12px rgba(212, 175, 55, 0.5);
+}
+
+.sound-toggle.small {
+  width: 34px;
+  height: 34px;
+  font-size: 1rem;
+}
+
 .logo-container {
   margin-bottom: 24px;
 }
@@ -160,11 +283,17 @@ button {
   object-fit: contain;
   border-radius: 50%;
   box-shadow: 0 0 35px rgba(212, 175, 55, 0.4), 0 0 70px rgba(45, 85, 255, 0.3);
-  transition: transform 0.3s ease;
+  animation: floatLogo 4s ease-in-out infinite, logoGlow 3s ease-in-out infinite alternate;
 }
 
-.main-logo:hover {
-  transform: scale(1.03);
+@keyframes floatLogo {
+  0%, 100% { transform: translateY(0); }
+  50%      { transform: translateY(-10px); }
+}
+
+@keyframes logoGlow {
+  from { box-shadow: 0 0 25px rgba(212, 175, 55, 0.3), 0 0 50px rgba(45, 85, 255, 0.2); }
+  to   { box-shadow: 0 0 45px rgba(212, 175, 55, 0.65), 0 0 90px rgba(45, 85, 255, 0.45); }
 }
 
 .main-title {
@@ -174,6 +303,12 @@ button {
   color: var(--text-gold);
   text-shadow: 0 0 15px rgba(244, 197, 66, 0.6), 0 2px 4px rgba(0, 0, 0, 0.8);
   margin-bottom: 12px;
+  animation: titleGlow 2.4s ease-in-out infinite alternate;
+}
+
+@keyframes titleGlow {
+  from { text-shadow: 0 0 10px rgba(244, 197, 66, 0.4), 0 2px 4px rgba(0, 0, 0, 0.8); }
+  to   { text-shadow: 0 0 28px rgba(244, 197, 66, 0.95), 0 2px 4px rgba(0, 0, 0, 0.8); }
 }
 
 .start-subtitle {
@@ -197,11 +332,16 @@ button {
   cursor: pointer;
   box-shadow: 0 0 25px rgba(212, 175, 55, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.4);
   transition: transform 0.15s ease, box-shadow 0.2s ease, filter 0.2s ease;
+  animation: btnPulse 1.8s ease-in-out infinite;
+}
+
+@keyframes btnPulse {
+  0%, 100% { box-shadow: 0 0 20px rgba(212, 175, 55, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.4); }
+  50%      { box-shadow: 0 0 40px rgba(212, 175, 55, 0.9), inset 0 1px 0 rgba(255, 255, 255, 0.4); }
 }
 
 .glow-button:hover {
-  transform: translateY(-2px) scale(1.03);
-  box-shadow: 0 0 35px rgba(212, 175, 55, 0.8), inset 0 1px 0 rgba(255, 255, 255, 0.6);
+  transform: translateY(-2px) scale(1.05);
   filter: brightness(1.1);
 }
 
@@ -210,24 +350,32 @@ button {
 }
 
 /* ==========================================================================
-   ÉCRAN DE JEU (Game Screen)
+   ÉCRAN DE JEU (Game Screen) - plein écran
    ========================================================================== */
+#game-screen {
+  direction: ltr; /* la zone de jeu garde la même disposition en arabe */
+}
+
 .game-header {
   display: flex;
   align-items: center;
   justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
   padding: 10px 16px;
   background: rgba(10, 15, 45, 0.6);
   border: 1px solid rgba(212, 175, 55, 0.25);
   border-radius: 12px;
   backdrop-filter: blur(8px);
-  margin-bottom: 18px;
+  margin-bottom: 16px;
 }
 
 .header-branding {
   display: flex;
   align-items: center;
   gap: 14px;
+  flex: 1 1 0;
+  min-width: 0;
 }
 
 /* Version miniature du logo (proportions respectées) */
@@ -240,6 +388,12 @@ button {
   box-shadow: 0 0 10px rgba(212, 175, 55, 0.4);
 }
 
+.header-info {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
 .question-progress {
   font-size: 1.15rem;
   font-weight: 700;
@@ -247,10 +401,79 @@ button {
   letter-spacing: 0.5px;
 }
 
+.question-prize {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: #e2e8f0;
+  opacity: 0.85;
+}
+
+/* --- Chronomètre circulaire --- */
+.timer {
+  position: relative;
+  width: 70px;
+  height: 70px;
+  flex-shrink: 0;
+}
+
+.timer svg {
+  width: 100%;
+  height: 100%;
+  transform: rotate(-90deg);
+}
+
+.timer-bg {
+  fill: rgba(8, 13, 38, 0.85);
+  stroke: rgba(255, 255, 255, 0.12);
+  stroke-width: 8;
+}
+
+.timer-fg {
+  fill: none;
+  stroke: var(--text-gold);
+  stroke-width: 8;
+  stroke-linecap: round;
+  stroke-dasharray: 276.46;
+  stroke-dashoffset: 0;
+  transition: stroke 0.3s ease;
+}
+
+.timer-text {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.6rem;
+  font-weight: 800;
+  color: #fff;
+  text-shadow: 0 0 8px rgba(0, 0, 0, 0.6);
+}
+
+.timer.warning .timer-fg {
+  stroke: #e74c3c;
+}
+
+.timer.warning .timer-text {
+  color: #ff8a80;
+}
+
+.timer.warning {
+  animation: timerPulse 0.5s ease-in-out infinite alternate;
+}
+
+@keyframes timerPulse {
+  from { transform: scale(1);    filter: drop-shadow(0 0 4px rgba(231, 76, 60, 0.4)); }
+  to   { transform: scale(1.12); filter: drop-shadow(0 0 14px rgba(231, 76, 60, 0.95)); }
+}
+
 /* Jokers (Lifelines) */
 .lifelines-container {
   display: flex;
+  align-items: center;
+  justify-content: flex-end;
   gap: 10px;
+  flex: 1 1 0;
 }
 
 .lifeline-btn {
@@ -284,32 +507,26 @@ button {
   box-shadow: none;
 }
 
-/* Corps du jeu : Arène (gauche/centre) + Échelle des gains (droite) */
+/* Corps du jeu : la question prend tout l'écran */
 .game-body {
   display: flex;
-  gap: 24px;
   flex: 1;
-  align-items: flex-start;
+  min-height: 0;
 }
 
 .quiz-arena {
   flex: 1;
   display: flex;
   flex-direction: column;
-  justify-content: center;
+  justify-content: space-between;
+  gap: 20px;
   min-width: 0;
-  padding-top: 10px;
+  width: 100%;
 }
 
 /* ==========================================================================
    HEXAGONES : Question et Réponses (Clip-Path & Bordures Dorées)
    ========================================================================== */
-
-/* Structure à deux couches :
-   - .hexagon-outer : applique le clip-path hexagonal et le fond dégradé doré (qui fait office de bordure)
-   - .hexagon-inner : applique le clip-path hexagonal légèrement réduit et le fond bleu nuit pour le contenu
-*/
-
 .hexagon-outer {
   position: relative;
   display: flex;
@@ -317,7 +534,7 @@ button {
   justify-content: center;
   padding: 2.5px;
   background: linear-gradient(180deg, var(--gold-border-start) 0%, var(--gold-border-mid) 45%, var(--gold-border-end) 100%);
-  clip-path: polygon(22px 0%, calc(100% - 22px) 0%, 100% 50%, calc(100% - 22px) 100%, 22px 100%, 0% 50%);
+  clip-path: polygon(26px 0%, calc(100% - 26px) 0%, 100% 50%, calc(100% - 26px) 100%, 26px 100%, 0% 50%);
   transition: transform 0.15s ease, filter 0.2s ease;
 }
 
@@ -325,45 +542,48 @@ button {
   width: 100%;
   height: 100%;
   background: linear-gradient(180deg, var(--blue-box-start) 0%, var(--blue-box-end) 100%);
-  clip-path: polygon(21px 0%, calc(100% - 21px) 0%, calc(100% - 1.5px) 50%, calc(100% - 21px) 100%, 21px 100%, 1.5px 50%);
+  clip-path: polygon(25px 0%, calc(100% - 25px) 0%, calc(100% - 1.5px) 50%, calc(100% - 25px) 100%, 25px 100%, 1.5px 50%);
   display: flex;
   align-items: center;
 }
 
-/* Bannière de question */
+/* Bannière de la question (grande, plein écran) */
 .question-wrapper {
   position: relative;
-  margin-bottom: 24px;
+  display: flex;
+  flex: 1 1 auto;
+  min-height: 170px;
   width: 100%;
 }
 
 .question-box {
+  flex: 1;
+  align-items: stretch;
   width: 100%;
-  min-height: 96px;
+  min-height: 170px;
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
 }
 
 .question-content {
-  padding: 16px 36px;
-  min-height: 90px;
+  padding: 24px clamp(28px, 6vw, 90px);
   justify-content: center;
   text-align: center;
 }
 
 #question-text {
-  font-size: clamp(1.05rem, 2.2vw, 1.35rem);
-  font-weight: 600;
-  line-height: 1.4;
+  font-size: clamp(1.4rem, 3.6vw, 2.8rem);
+  font-weight: 700;
+  line-height: 1.35;
   color: var(--text-white);
-  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.7);
+  text-shadow: 0 2px 6px rgba(0, 0, 0, 0.7);
 }
 
 /* Grille des réponses 2x2 */
 .answers-grid {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
+  grid-auto-rows: minmax(78px, 11vh);
   gap: 16px;
-  margin-bottom: 24px;
 }
 
 /* Boutons de réponse */
@@ -371,12 +591,12 @@ button {
   border: none;
   cursor: pointer;
   outline: none;
-  min-height: 56px;
+  min-height: 78px;
   background: linear-gradient(180deg, var(--gold-border-start) 0%, var(--gold-border-mid) 45%, var(--gold-border-end) 100%);
 }
 
 .answer-content {
-  padding: 12px 28px;
+  padding: 12px 34px;
   justify-content: flex-start;
   text-align: left;
   transition: background 0.2s ease, color 0.2s ease;
@@ -385,25 +605,63 @@ button {
 .answer-letter {
   color: var(--text-gold);
   font-weight: 800;
-  font-size: 1.15rem;
-  margin-right: 12px;
+  font-size: clamp(1.2rem, 2.2vw, 1.6rem);
+  margin-right: 14px;
   flex-shrink: 0;
 }
 
 .answer-text {
-  font-size: clamp(0.95rem, 1.8vw, 1.1rem);
+  font-size: clamp(1.05rem, 2.2vw, 1.5rem);
   font-weight: 500;
   color: var(--text-white);
   line-height: 1.3;
 }
 
+/* --- Animations d'entrée à chaque nouvelle question --- */
+.quiz-arena.enter .question-box {
+  animation: questionIn 0.7s cubic-bezier(0.2, 0.9, 0.3, 1.2) backwards;
+}
+
+.quiz-arena.enter .answer-btn {
+  animation: answerIn 0.55s cubic-bezier(0.2, 0.9, 0.3, 1.1) backwards;
+}
+
+.quiz-arena.enter .answer-btn:nth-child(1) { animation-delay: 0.45s; }
+.quiz-arena.enter .answer-btn:nth-child(2) { animation-delay: 0.6s; }
+.quiz-arena.enter .answer-btn:nth-child(3) { animation-delay: 0.75s; }
+.quiz-arena.enter .answer-btn:nth-child(4) { animation-delay: 0.9s; }
+
+@keyframes questionIn {
+  from { opacity: 0; transform: scale(0.7) translateY(-30px); }
+  to   { opacity: 1; transform: scale(1) translateY(0); }
+}
+
+@keyframes answerIn {
+  from { opacity: 0; transform: translateX(-60px) scale(0.9); }
+  to   { opacity: 1; transform: translateX(0) scale(1); }
+}
+
+/* Secousse en cas de mauvaise réponse */
+.quiz-arena.shake {
+  animation: shake 0.55s ease-in-out;
+}
+
+@keyframes shake {
+  0%, 100% { transform: translateX(0); }
+  15% { transform: translateX(-14px); }
+  30% { transform: translateX(12px); }
+  45% { transform: translateX(-10px); }
+  60% { transform: translateX(8px); }
+  75% { transform: translateX(-5px); }
+}
+
 /* État Survol */
-.answer-btn:hover:not(:disabled):not(.selected):not(.correct):not(.wrong) {
+.answer-btn:hover:not(:disabled):not(.selected):not(.correct):not(.wrong):not(.locked) {
   transform: scale(1.015);
   filter: drop-shadow(0 0 8px rgba(212, 175, 55, 0.4));
 }
 
-.answer-btn:hover:not(:disabled):not(.selected):not(.correct):not(.wrong) .answer-content {
+.answer-btn:hover:not(:disabled):not(.selected):not(.correct):not(.wrong):not(.locked) .answer-content {
   background: linear-gradient(180deg, var(--blue-box-hover) 0%, #0d1a4a 100%);
 }
 
@@ -424,6 +682,26 @@ button {
   text-shadow: 0 0 6px rgba(0, 0, 0, 0.5);
 }
 
+/* État Verrouillé (réponse finale, suspense avant la révélation) */
+.answer-btn.locked {
+  background: linear-gradient(180deg, #ffe066 0%, #ffffff 45%, #d48806 100%);
+  animation: lockedBlink 0.3s ease-in-out infinite alternate;
+}
+
+.answer-btn.locked .answer-content {
+  background: linear-gradient(180deg, var(--orange-selected-start) 0%, var(--orange-selected-end) 100%);
+  color: #ffffff;
+}
+
+.answer-btn.locked .answer-letter {
+  color: #fff9db;
+}
+
+@keyframes lockedBlink {
+  from { transform: scale(1.02); filter: drop-shadow(0 0 6px rgba(243, 156, 18, 0.5)) brightness(0.9); }
+  to   { transform: scale(1.04); filter: drop-shadow(0 0 20px rgba(255, 200, 60, 1)) brightness(1.3); }
+}
+
 /* État Réponse Correcte : vert */
 .answer-btn.correct {
   background: linear-gradient(180deg, #a3f7bf 0%, #ffffff 45%, #196f3d 100%);
@@ -442,7 +720,7 @@ button {
 
 @keyframes pulse-correct {
   from { transform: scale(1); filter: drop-shadow(0 0 10px rgba(39, 174, 96, 0.7)); }
-  to { transform: scale(1.025); filter: drop-shadow(0 0 18px rgba(39, 174, 96, 1)); }
+  to   { transform: scale(1.03); filter: drop-shadow(0 0 22px rgba(39, 174, 96, 1)); }
 }
 
 /* État Réponse Fausse : rouge */
@@ -478,8 +756,9 @@ button {
   display: flex;
   flex-direction: column;
   align-items: center;
+  justify-content: center;
   gap: 14px;
-  min-height: 60px;
+  min-height: 64px;
 }
 
 .action-btn {
@@ -506,6 +785,10 @@ button {
   filter: brightness(1.1);
 }
 
+.validate-btn:not(:disabled) {
+  animation: btnPulse 1.4s ease-in-out infinite;
+}
+
 .validate-btn:disabled {
   background: #1f274a;
   color: #5d678e;
@@ -524,15 +807,16 @@ button {
   border-radius: 30px;
   background: rgba(12, 18, 52, 0.85);
   border: 1px solid rgba(212, 175, 55, 0.3);
-  animation: fadeIn 0.3s ease-out;
+  animation: resultPop 0.45s cubic-bezier(0.2, 0.9, 0.3, 1.3);
 }
 
-.result-box.hidden {
-  display: none;
+@keyframes resultPop {
+  from { opacity: 0; transform: scale(0.6); }
+  to   { opacity: 1; transform: scale(1); }
 }
 
 .result-message {
-  font-size: 1.2rem;
+  font-size: 1.3rem;
   font-weight: 800;
   letter-spacing: 0.5px;
 }
@@ -562,20 +846,51 @@ button {
 }
 
 /* ==========================================================================
-   ÉCHELLE DES GAINS (Prize Ladder)
+   ÉCRAN DES GAINS (affiché après chaque réponse)
    ========================================================================== */
-.prize-ladder-aside {
-  width: 250px;
-  flex-shrink: 0;
+.score-card {
+  max-width: 400px;
+  max-height: 94vh;
+  max-height: 94dvh;
+  overflow-y: auto;
+  padding: 20px 22px 22px;
+  animation: modalPop 0.5s cubic-bezier(0.2, 0.9, 0.3, 1.25);
 }
 
-.prize-ladder-card {
-  background: rgba(8, 13, 38, 0.85);
-  border: 1px solid rgba(212, 175, 55, 0.3);
-  border-radius: 12px;
-  padding: 14px 12px;
-  backdrop-filter: blur(10px);
-  box-shadow: 0 4px 25px rgba(0, 0, 0, 0.6);
+@keyframes modalPop {
+  from { opacity: 0; transform: scale(0.7) translateY(30px); }
+  to   { opacity: 1; transform: scale(1) translateY(0); }
+}
+
+.won-label {
+  font-size: 0.95rem;
+  color: #cbd5e1;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+}
+
+.won-amount {
+  font-size: clamp(2rem, 7vw, 2.8rem);
+  font-weight: 800;
+  color: var(--text-gold);
+  text-shadow: 0 0 20px rgba(244, 197, 66, 0.8);
+  margin: 4px 0 6px;
+  animation: amountPop 0.7s cubic-bezier(0.2, 0.9, 0.3, 1.5) 0.2s backwards;
+}
+
+@keyframes amountPop {
+  from { opacity: 0; transform: scale(0.3); }
+  to   { opacity: 1; transform: scale(1); }
+}
+
+.milestone-note {
+  display: inline-block;
+  font-size: 0.9rem;
+  font-weight: 800;
+  color: #2ecc71;
+  text-shadow: 0 0 10px rgba(46, 204, 113, 0.6);
+  margin-bottom: 8px;
+  animation: titleGlow 1.2s ease-in-out infinite alternate;
 }
 
 .ladder-title {
@@ -584,8 +899,9 @@ button {
   letter-spacing: 1.5px;
   color: var(--text-gold);
   text-align: center;
-  padding-bottom: 8px;
-  margin-bottom: 6px;
+  padding: 8px 0;
+  margin: 8px 0 6px;
+  border-top: 1px solid rgba(212, 175, 55, 0.25);
   border-bottom: 1px solid rgba(212, 175, 55, 0.2);
 }
 
@@ -594,24 +910,37 @@ button {
   display: flex;
   flex-direction: column;
   gap: 3px;
+  margin-bottom: 16px;
 }
 
 .ladder-step {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 4px 10px;
+  padding: 4px 12px;
   border-radius: 4px;
-  font-size: 0.9rem;
+  font-size: 0.95rem;
   font-weight: 600;
   color: var(--text-gold);
   transition: all 0.2s ease;
 }
 
+/* Les lignes apparaissent de bas en haut à l'ouverture de l'écran */
+.modal-backdrop:not(.hidden) .ladder-step {
+  animation: ladderIn 0.4s ease-out backwards;
+  animation-delay: calc(var(--i, 1) * 40ms + 0.25s);
+}
+
+@keyframes ladderIn {
+  from { opacity: 0; transform: translateX(-24px); }
+  to   { opacity: 1; transform: translateX(0); }
+}
+
 .ladder-step .step-num {
   width: 22px;
   color: #a4b0be;
-  font-size: 0.82rem;
+  font-size: 0.85rem;
+  text-align: left;
 }
 
 .ladder-step .step-amount {
@@ -628,13 +957,13 @@ button {
   color: #ffffff;
 }
 
-/* Niveau actuel en cours */
+/* Niveau qui vient d'être gagné */
 .ladder-step.current {
   background: linear-gradient(90deg, #f39c12 0%, #e67e22 100%);
   color: #0b0f24;
   font-weight: 800;
-  box-shadow: 0 0 12px rgba(243, 156, 18, 0.8);
-  transform: scale(1.03);
+  box-shadow: 0 0 14px rgba(243, 156, 18, 0.9);
+  transform: scale(1.04);
 }
 
 .ladder-step.current .step-num {
@@ -645,7 +974,13 @@ button {
 /* Niveaux déjà validés */
 .ladder-step.passed {
   color: #7bed9f;
-  opacity: 0.7;
+  opacity: 0.75;
+}
+
+.continue-btn {
+  width: 100%;
+  padding: 12px 20px;
+  font-size: 1.05rem;
 }
 
 /* ==========================================================================
@@ -669,6 +1004,7 @@ button {
   border-radius: 20px;
   box-shadow: 0 8px 32px rgba(0, 0, 0, 0.7);
   backdrop-filter: blur(12px);
+  animation: modalPop 0.6s cubic-bezier(0.2, 0.9, 0.3, 1.25);
 }
 
 .end-logo {
@@ -680,6 +1016,7 @@ button {
   border-radius: 50%;
   box-shadow: 0 0 30px rgba(212, 175, 55, 0.4);
   margin-bottom: 20px;
+  animation: floatLogo 4s ease-in-out infinite;
 }
 
 .end-title {
@@ -692,6 +1029,7 @@ button {
 .end-title.win {
   color: #2ecc71;
   text-shadow: 0 0 20px rgba(46, 204, 113, 0.6);
+  animation: titleGlow 1.4s ease-in-out infinite alternate;
 }
 
 .end-title.lose {
@@ -722,12 +1060,14 @@ button {
   border: 1px solid rgba(212, 175, 55, 0.2);
   border-radius: 10px;
   padding: 12px 18px;
+  animation: ladderIn 0.5s ease-out 0.3s backwards;
 }
 
 .stat-item.highlight {
   border-color: #d4af37;
   background: rgba(30, 45, 115, 0.7);
   box-shadow: 0 0 15px rgba(212, 175, 55, 0.2);
+  animation-delay: 0.15s;
 }
 
 .stat-label {
@@ -742,12 +1082,12 @@ button {
 }
 
 /* ==========================================================================
-   MODALE JOKER PUBLIC
+   MODALES (Public + Gains)
    ========================================================================== */
 .modal-backdrop {
   position: fixed;
   inset: 0;
-  background: rgba(3, 4, 15, 0.75);
+  background: rgba(3, 4, 15, 0.78);
   backdrop-filter: blur(6px);
   z-index: 100;
   display: flex;
@@ -755,10 +1095,6 @@ button {
   justify-content: center;
   padding: 16px;
   animation: fadeIn 0.2s ease-out;
-}
-
-.modal-backdrop.hidden {
-  display: none;
 }
 
 .modal-card {
@@ -793,6 +1129,7 @@ button {
   padding: 10px 0 20px;
   border-bottom: 1px solid rgba(212, 175, 55, 0.3);
   margin-bottom: 22px;
+  direction: ltr;
 }
 
 .audience-bar-col {
@@ -825,7 +1162,7 @@ button {
   width: 100%;
   background: linear-gradient(180deg, #3498db 0%, #1e5799 100%);
   border-radius: 4px 4px 0 0;
-  transition: height 0.6s cubic-bezier(0.2, 0.8, 0.2, 1);
+  transition: height 0.9s cubic-bezier(0.2, 0.8, 0.2, 1);
 }
 
 .audience-bar-inner.lead {
@@ -856,51 +1193,62 @@ button {
 }
 
 /* ==========================================================================
+   CONFETTIS
+   ========================================================================== */
+.confetti-layer {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  overflow: hidden;
+  z-index: 200;
+}
+
+.confetti-piece {
+  position: absolute;
+  top: -20px;
+  display: block;
+  border-radius: 2px;
+  opacity: 0;
+  animation: confettiFall linear forwards;
+}
+
+@keyframes confettiFall {
+  0%   { opacity: 1; transform: translate3d(0, 0, 0) rotate(0deg); }
+  100% { opacity: 0.9; transform: translate3d(var(--drift, 0px), 110vh, 0) rotate(720deg); }
+}
+
+/* ==========================================================================
    RESPONSIVE DESIGN (Tablette & Mobile)
-   "On mobile, answers become a single column, prize ladder moves below or collapses,
-   no horizontal scrolling."
    ========================================================================== */
 @media (max-width: 860px) {
-  .game-body {
-    flex-direction: column;
-    align-items: stretch;
-    gap: 20px;
-  }
-
-  .quiz-arena {
-    padding-top: 0;
-  }
-
-  /* Passage en 1 colonne pour les réponses */
   .answers-grid {
     grid-template-columns: 1fr;
+    grid-auto-rows: minmax(64px, auto);
     gap: 12px;
   }
 
   .question-content {
-    padding: 14px 20px;
-    min-height: 80px;
+    padding: 18px 30px;
   }
 
   .answer-content {
-    padding: 10px 20px;
+    padding: 10px 26px;
+  }
+}
+
+@media (max-width: 640px) {
+  .game-header {
+    justify-content: center;
   }
 
-  /* Échelle des gains sous les questions sur mobile */
-  .prize-ladder-aside {
-    width: 100%;
-    margin-top: 8px;
+  .header-branding,
+  .lifelines-container {
+    flex: 1 1 100%;
+    justify-content: center;
   }
 
-  .ladder-list {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 6px;
-  }
-
-  .ladder-step {
-    padding: 6px 8px;
-    font-size: 0.82rem;
+  .timer {
+    order: -1;
   }
 }
 
@@ -909,8 +1257,8 @@ button {
     padding: 10px;
   }
 
-  .game-header {
-    padding: 8px 10px;
+  body.in-game .app-container {
+    padding: 10px;
   }
 
   .lifeline-btn {
@@ -922,8 +1270,13 @@ button {
     font-size: 0.95rem;
   }
 
-  .ladder-list {
-    grid-template-columns: repeat(2, 1fr);
+  .timer {
+    width: 58px;
+    height: 58px;
+  }
+
+  .timer-text {
+    font-size: 1.3rem;
   }
 
   .action-bar {
@@ -935,5 +1288,18 @@ button {
     gap: 10px;
     width: 100%;
     text-align: center;
+  }
+
+  .modal-card {
+    padding: 20px 18px;
+  }
+}
+
+/* Respect des préférences de réduction des animations */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
   }
 }
