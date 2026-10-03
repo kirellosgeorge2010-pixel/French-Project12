@@ -1,6 +1,7 @@
 /**
  * questions.js
  * Base de données des questions du jeu « Qui veut gagner des millions ? »
+ * Thèmes : saisons, jours de la semaine, mois de l'année et nombres.
  * 15 questions principales : 1 à 5 faciles, 6 à 10 moyennes, 11 à 15 difficiles.
  * Questions de réserve (spareQuestions) pour le joker « Changer de question ».
  */
@@ -10,28 +11,28 @@ const questions = [
   // NIVEAU FACILE (Questions 1 à 5)
   // ===================================================
   {
-    question: "Quelle planète de notre système solaire est surnommée la « planète rouge » ?",
-    answers: ["Vénus", "Mars", "Jupiter", "Mercure"],
-    correct: 1
-  },
-  {
-    question: "Quelle est la capitale officielle de l'Italie ?",
-    answers: ["Milan", "Venise", "Rome", "Florence"],
-    correct: 2
-  },
-  {
-    question: "Qui a écrit le célèbre roman « Les Misérables », mettant en scène Jean Valjean ?",
-    answers: ["Victor Hugo", "Émile Zola", "Gustave Flaubert", "Alexandre Dumas"],
+    question: "Quelle saison vient après l’hiver ?",
+    answers: ["Le printemps", "L’été", "L’automne", "L’hiver"],
     correct: 0
   },
   {
-    question: "Combien de côtés possède un hexagone régulier ?",
-    answers: ["5 côtés", "8 côtés", "6 côtés", "7 côtés"],
+    question: "Quel jour vient après lundi ?",
+    answers: ["Dimanche", "Mardi", "Jeudi", "Samedi"],
+    correct: 1
+  },
+  {
+    question: "En quelle saison fait-il très chaud ?",
+    answers: ["En hiver", "Au printemps", "En été", "En automne"],
     correct: 2
   },
   {
-    question: "Quel organe vital assure la circulation continue du sang dans le corps humain ?",
-    answers: ["Les poumons", "Le cœur", "Le foie", "L'estomac"],
+    question: "Combien y a-t-il de mois dans une année ?",
+    answers: ["10", "11", "12", "13"],
+    correct: 2
+  },
+  {
+    question: "Quel est le premier mois de l’année ?",
+    answers: ["Décembre", "Janvier", "Mars", "Février"],
     correct: 1
   },
 
@@ -39,58 +40,58 @@ const questions = [
   // NIVEAU MOYEN (Questions 6 à 10)
   // ===================================================
   {
-    question: "En quelle année s'est déroulée la prise de la Bastille lors de la Révolution française ?",
-    answers: ["1776", "1789", "1799", "1804"],
-    correct: 1
-  },
-  {
-    question: "Quel savant français a mis au point le premier vaccin efficace contre la rage en 1885 ?",
-    answers: ["Louis Pasteur", "René Laennec", "Antoine Lavoisier", "Claude Bernard"],
-    correct: 0
-  },
-  {
-    question: "Quel peintre néerlandais a peint le vertigineux chef-d'œuvre « La Nuit étoilée » en 1889 ?",
-    answers: ["Rembrandt", "Johannes Vermeer", "Vincent van Gogh", "Piet Mondrian"],
-    correct: 2
-  },
-  {
-    question: "Quel est le plus long fleuve dont le cours s'écoule intégralement en France métropolitaine ?",
-    answers: ["La Seine", "Le Rhône", "La Garonne", "La Loire"],
+    question: "Quelle saison vient après le printemps ?",
+    answers: ["L’automne", "L’hiver", "Le printemps", "L’été"],
     correct: 3
   },
   {
-    question: "Quel sprinteur jamaïcain détient le record du monde du 100 mètres en 9 secondes et 58 centièmes ?",
-    answers: ["Carl Lewis", "Usain Bolt", "Tyson Gay", "Yohan Blake"],
+    question: "En quelle saison les feuilles tombent-elles ?",
+    answers: ["En automne", "Au printemps", "En été", "En hiver"],
+    correct: 0
+  },
+  {
+    question: "Quels jours composent le week-end en France ?",
+    answers: ["Lundi et mardi", "Jeudi et vendredi", "Samedi et dimanche", "Mercredi et jeudi"],
+    correct: 2
+  },
+  {
+    question: "Complétez la suite : Mercredi, jeudi, ________, samedi.",
+    answers: ["Lundi", "Vendredi", "Mardi", "Dimanche"],
     correct: 1
+  },
+  {
+    question: "Comment écrit-on le nombre 8 en français ?",
+    answers: ["Sept", "Six", "Neuf", "Huit"],
+    correct: 3
   },
 
   // ===================================================
   // NIVEAU DIFFICILE (Questions 11 à 15)
   // ===================================================
   {
-    question: "En quelle année les frères Wright ont-ils réussi le premier vol motorisé contrôlé de l'Histoire ?",
-    answers: ["1898", "1901", "1903", "1909"],
+    question: "Quel est le premier jour de la semaine en France ?",
+    answers: ["Samedi", "Dimanche", "Lundi", "Mardi"],
     correct: 2
   },
   {
-    question: "Hormis le Soleil, quelle est l'étoile la plus proche de notre système planétaire ?",
-    answers: ["Proxima du Centaure", "Sirius A", "Bételgeuse", "Véga"],
+    question: "Si aujourd'hui c'est dimanche, quel jour était hier ?",
+    answers: ["Lundi", "Samedi", "Vendredi", "Jeudi"],
+    correct: 1
+  },
+  {
+    question: "Complétez la suite : Janvier, février, ________, avril.",
+    answers: ["Mai", "Juin", "Mars", "Juillet"],
+    correct: 2
+  },
+  {
+    question: "Quel nombre vient après dix-neuf ?",
+    answers: ["Vingt", "Dix-huit", "Trente", "Dix-sept"],
     correct: 0
   },
   {
-    question: "Quel chef gaulois a infligé une défaite à Jules César lors du siège de Gergovie en 52 avant J.-C. ?",
-    answers: ["Ambiorix", "Dumnorix", "Brennus", "Vercingétorix"],
+    question: "Quels sont les mois de l’été en France ?",
+    answers: ["Décembre, janvier, février", "Mars, avril, mai", "Septembre, octobre, novembre", "Juin, juillet, août"],
     correct: 3
-  },
-  {
-    question: "Dans quel opéra magistral de Georges Bizet entend-on l'air « L'amour est un oiseau rebelle » ?",
-    answers: ["La Traviata", "Les Pêcheurs de perles", "Carmen", "Faust"],
-    correct: 2
-  },
-  {
-    question: "Quelle particule élémentaire observée au CERN en 2012 confère leur masse aux autres particules ?",
-    answers: ["Le neutrino", "Le boson de Higgs", "Le gluon", "Le positron"],
-    correct: 1
   }
 ];
 
@@ -98,38 +99,43 @@ const questions = [
 const spareQuestions = {
   easy: [
     {
-      question: "Dans quelle ville européenne peut-on admirer la tour Eiffel et le musée du Louvre ?",
-      answers: ["Bruxelles", "Genève", "Madrid", "Paris"],
-      correct: 3
+      question: "Quelles sont les quatre saisons de l’année ?",
+      answers: [
+        "Le printemps, l’été, l’automne et l’hiver",
+        "Janvier, février, mars et avril",
+        "Lundi, mardi, mercredi et jeudi",
+        "Le matin, le midi, le soir et la nuit"
+      ],
+      correct: 0
     },
     {
-      question: "Quelle sélection nationale a remporté la Coupe du Monde masculine de football en 1998 et 2018 ?",
-      answers: ["Le Brésil", "L'Allemagne", "La France", "L'Argentine"],
+      question: "Si aujourd'hui c'est mardi, quel jour sera demain ?",
+      answers: ["Lundi", "Jeudi", "Mercredi", "Dimanche"],
       correct: 2
     }
   ],
   medium: [
     {
-      question: "Quel cosmonaute est entré dans l'Histoire le 12 avril 1961 comme le premier être humain dans l'espace ?",
-      answers: ["Neil Armstrong", "Youri Gagarine", "Buzz Aldrin", "Alexeï Leonov"],
+      question: "Quel jour vient avant vendredi ?",
+      answers: ["Mardi", "Jeudi", "Dimanche", "Samedi"],
       correct: 1
     },
     {
-      question: "Quel élément métallique a la particularité d'être à l'état liquide sous conditions normales de température ?",
-      answers: ["Le plomb", "Le mercure", "L'argent", "L'étain"],
-      correct: 1
+      question: "Quel est le dernier mois de l’année ?",
+      answers: ["Novembre", "Octobre", "Décembre", "Janvier"],
+      correct: 2
     }
   ],
   hard: [
     {
-      question: "Quel architecte sino-américain de renommée mondiale est l'auteur de la Pyramide de verre du Louvre ?",
-      answers: ["Jean Nouvel", "Renzo Piano", "Frank Gehry", "Ieoh Ming Pei"],
+      question: "Quelle saison vient après l’automne ?",
+      answers: ["L’été", "Le printemps", "L’automne", "L’hiver"],
       correct: 3
     },
     {
-      question: "Quel traité historique signé en 1992 aux Pays-Bas a créé officiellement l'Union européenne ?",
-      answers: ["Le traité de Rome", "Le traité de Maastricht", "Le traité de Lisbonne", "Le traité d'Amsterdam"],
-      correct: 1
+      question: "Quel mois vient après août ?",
+      answers: ["Septembre", "Juillet", "Octobre", "Juin"],
+      correct: 0
     }
   ]
 };
