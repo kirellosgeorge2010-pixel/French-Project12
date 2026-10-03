@@ -196,9 +196,23 @@ const Sound = (() => {
 
   // --- Fichiers audio (placer les .mp3 dans le dossier « sounds/ ») ---
   // Si un fichier est absent, le jeu utilise automatiquement un son synthétisé.
+  // Chaque son accepte plusieurs noms de fichier : le premier trouvé est utilisé
+  // (dans le dossier « sounds/ » ou directement à côté de index.html).
   const AUDIO_FILES = {
-    intro: "مقدمة من سيربح المليون 2.mp3",       // générique, joué sur l'écran d'accueil
-    suspense: "Who Wants to be a Millionaire Suspense - Sound Effect (HD).mp3"  // suspense, rejoué à chaque question
+    // générique, joué sur l'écran d'accueil
+    intro: [
+      "sounds/intro.mp3",
+      "intro.mp3",
+      "sounds/مقدمة من سيربح المليون 2.mp3",
+      "مقدمة من سيربح المليون 2.mp3"
+    ],
+    // suspense, rejoué à chaque question
+    suspense: [
+      "sounds/suspense.mp3",
+      "suspense.mp3",
+      "sounds/Who Wants to be a Millionaire Suspense - Sound Effect (HD).mp3",
+      "Who Wants to be a Millionaire Suspense - Sound Effect (HD).mp3"
+    ]
   };
   const AUDIO_VOLUME = { intro: 1.0, suspense: 0.8 };
   const music = { intro: null, suspense: null };
@@ -206,12 +220,24 @@ const Sound = (() => {
 
   function loadMusic(name, loop) {
     try {
-      const a = new Audio(AUDIO_FILES[name]);
+      const candidates = AUDIO_FILES[name];
+      let index = 0;
+      const a = new Audio();
       a.preload = "auto";
       a.loop = loop;
       a.volume = AUDIO_VOLUME[name];
       a.muted = muted;
-      a.addEventListener("error", () => { musicFailed[name] = true; });
+      // Fichier introuvable : on essaie le nom suivant de la liste
+      a.addEventListener("error", () => {
+        index++;
+        if (index < candidates.length) {
+          a.src = encodeURI(candidates[index]);
+          a.load();
+        } else {
+          musicFailed[name] = true;
+        }
+      });
+      a.src = encodeURI(candidates[0]);
       music[name] = a;
     } catch (e) {
       musicFailed[name] = true;
