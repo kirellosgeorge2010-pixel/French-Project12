@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Qui Veut Gagner des Millions ?</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <!-- Fond de scène et projecteurs -->
+  <div class="stage-background">
+    <div class="spotlight spotlight-left"></div>
+    <div class="spotlight spotlight-right"></div>
+    <div class="stage-glow"></div>
+  </div>
+
+  <div class="app-container">
+    <!-- ========================================== -->
+    <!-- ÉCRAN DE DÉPART                            -->
+    <!-- ========================================== -->
+    <section id="start-screen" class="screen active">
+      <div class="start-card">
+        <div class="logo-container">
+          <img src="logo.png" alt="Logo Le Million Quiz" class="main-logo">
+        </div>
+        <h1 class="main-title">QUI VEUT GAGNER DES MILLIONS ?</h1>
+        <p class="start-subtitle">15 questions vers le million d'euros. Êtes-vous prêt ?</p>
+        <button id="btn-start" class="glow-button">COMMENCER</button>
+      </div>
+    </section>
+
+    <!-- ========================================== -->
+    <!-- ÉCRAN DE JEU                               -->
+    <!-- ========================================== -->
+    <section id="game-screen" class="screen">
+      <!-- En-tête : logo miniature, compteur, jokers -->
+      <header class="game-header">
+        <div class="header-branding">
+          <img src="logo.png" alt="Logo" class="mini-logo">
+          <span id="question-progress" class="question-progress">Question 1 / 15</span>
+        </div>
+
+        <!-- Jokers -->
+        <div class="lifelines-container" aria-label="Jokers">
+          <button id="lifeline-5050" class="lifeline-btn" title="50:50 (Supprime deux mauvaises réponses)">
+            <span class="lifeline-label">50:50</span>
+          </button>
+          <button id="lifeline-audience" class="lifeline-btn" title="Question au public">
+            <span class="lifeline-label">Public</span>
+          </button>
+          <button id="lifeline-swap" class="lifeline-btn" title="Changer de question">
+            <span class="lifeline-label">Changer</span>
+          </button>
+        </div>
+      </header>
+
+      <!-- Corps du jeu : Arène des questions + Pyramide des gains -->
+      <div class="game-body">
+        <!-- Arène des questions -->
+        <main class="quiz-arena">
+          <!-- Bannière horizontale de la question -->
+          <div class="hexagon-wrapper question-wrapper">
+            <div class="hexagon-outer question-box">
+              <div class="hexagon-inner question-content">
+                <p id="question-text">Chargement de la question...</p>
+              </div>
+            </div>
+          </div>
+
+          <!-- Grille des 4 réponses 2x2 -->
+          <div class="answers-grid" id="answers-grid">
+            <button class="hexagon-outer answer-btn" data-index="0" id="answer-0">
+              <span class="hexagon-inner answer-content">
+                <span class="answer-letter">A:</span>
+                <span class="answer-text" id="answer-text-0">Réponse A</span>
+              </span>
+            </button>
+
+            <button class="hexagon-outer answer-btn" data-index="1" id="answer-1">
+              <span class="hexagon-inner answer-content">
+                <span class="answer-letter">B:</span>
+                <span class="answer-text" id="answer-text-1">Réponse B</span>
+              </span>
+            </button>
+
+            <button class="hexagon-outer answer-btn" data-index="2" id="answer-2">
+              <span class="hexagon-inner answer-content">
+                <span class="answer-letter">C:</span>
+                <span class="answer-text" id="answer-text-2">Réponse C</span>
+              </span>
+            </button>
+
+            <button class="hexagon-outer answer-btn" data-index="3" id="answer-3">
+              <span class="hexagon-inner answer-content">
+                <span class="answer-letter">D:</span>
+                <span class="answer-text" id="answer-text-3">Réponse D</span>
+              </span>
+            </button>
+          </div>
+
+          <!-- Zone de validation et messages -->
+          <div class="action-bar">
+            <!-- Bouton Valider -->
+            <button id="btn-validate" class="action-btn validate-btn" disabled>
+              Valider
+            </button>
+
+            <!-- Résultat et bouton suivant -->
+            <div id="result-box" class="result-box hidden">
+              <span id="result-message" class="result-message"></span>
+              <button id="btn-next" class="action-btn next-btn">
+                Question suivante →
+              </button>
+            </div>
+          </div>
+        </main>
+
+        <!-- Échelle / Pyramide des gains -->
+        <aside class="prize-ladder-aside" id="prize-ladder-aside">
+          <div class="prize-ladder-card">
+            <h2 class="ladder-title">ÉCHELLE DES GAINS</h2>
+            <ul class="ladder-list" id="ladder-list">
+              <!-- Rempli dynamiquement en JavaScript de 15 à 1 -->
+            </ul>
+          </div>
+        </aside>
+      </div>
+    </section>
+
+    <!-- ========================================== -->
+    <!-- ÉCRAN FINAL                                -->
+    <!-- ========================================== -->
+    <section id="end-screen" class="screen">
+      <div class="end-card">
+        <div class="logo-container">
+          <img src="logo.png" alt="Logo Le Million" class="end-logo">
+        </div>
+        <h1 id="end-title" class="end-title">Félicitations !</h1>
+        <p id="end-status" class="end-status">Vous avez remporté le million !</p>
+
+        <div class="end-stats">
+          <div class="stat-item highlight">
+            <span class="stat-label">Gain final remporté</span>
+            <span id="end-prize" class="stat-value">1 000 000 €</span>
+          </div>
+          <div class="stat-item">
+            <span class="stat-label">Bonnes réponses</span>
+            <span id="end-score" class="stat-value">15 / 15</span>
+          </div>
+        </div>
+
+        <button id="btn-restart" class="glow-button">Rejouer</button>
+      </div>
+    </section>
+
+    <!-- ========================================== -->
+    <!-- MODALE JOKER : AVIS DU PUBLIC             -->
+    <!-- ========================================== -->
+    <div id="audience-modal" class="modal-backdrop hidden" role="dialog" aria-modal="true" aria-labelledby="audience-title">
+      <div class="modal-card">
+        <h3 id="audience-title" class="modal-title">Vote du Public</h3>
+        <p class="modal-description">Voici la répartition des votes des spectateurs en plateau :</p>
+        
+        <div class="audience-chart" id="audience-chart">
+          <!-- Généré dynamiquement en JS avec A, B, C, D et barres animées -->
+        </div>
+
+        <button id="btn-close-audience" class="modal-btn">Fermer</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Scripts -->
+  <script src="questions.js"></script>
+  <script src="script.js"></script>
+</body>
+</html>
