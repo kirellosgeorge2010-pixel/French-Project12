@@ -194,6 +194,62 @@ const Sound = (() => {
   let tensionId = null;
   let tensionStep = 0;
 
+  // --- Fichiers audio (placer les .mp3 dans le dossier « sounds/ ») ---
+  // Si un fichier est absent, le jeu utilise automatiquement un son synthétisé.
+  const AUDIO_FILES = {
+    intro: "sounds/intro.mp3",       // générique, joué sur l'écran d'accueil
+    suspense: "sounds/suspense.mp3"  // suspense, rejoué à chaque question
+  };
+  const AUDIO_VOLUME = { intro: 1.0, suspense: 0.8 };
+  const music = { intro: null, suspense: null };
+  const musicFailed = { intro: false, suspense: false };
+
+  function loadMusic(name, loop) {
+    try {
+      const a = new Audio(AUDIO_FILES[name]);
+      a.preload = "auto";
+      a.loop = loop;
+      a.volume = AUDIO_VOLUME[name];
+      a.muted = muted;
+      a.addEventListener("error", () => { musicFailed[name] = true; });
+      music[name] = a;
+    } catch (e) {
+      musicFailed[name] = true;
+    }
+  }
+  loadMusic("intro", true);
+  loadMusic("suspense", true);
+
+  function hasFile(name) {
+    return !!music[name] && !musicFailed[name];
+  }
+
+  /** Joue le générique de l'écran d'accueil (résout true si le son démarre). */
+  function playIntro() {
+    if (!hasFile("intro")) return Promise.resolve(false);
+    const p = music.intro.play();
+    return p && p.then ? p.then(() => true).catch(() => false) : Promise.resolve(true);
+  }
+
+  /** Arrête le générique (avec un fondu), puis le remet au début. */
+  function stopIntro(fadeMs = 500) {
+    const a = music.intro;
+    if (!a || a.paused) return;
+    const steps = 10;
+    let i = 0;
+    const startVol = AUDIO_VOLUME.intro;
+    const id = setInterval(() => {
+      i++;
+      a.volume = Math.max(0, startVol * (1 - i / steps));
+      if (i >= steps) {
+        clearInterval(id);
+        a.pause();
+        try { a.currentTime = 0; } catch (e) { /* ignoré */ }
+        a.volume = startVol;
+      }
+    }, Math.max(10, fadeMs / steps));
+  }
+
   /** À appeler lors d'un clic utilisateur (exigé par les navigateurs). */
   function unlock() {
     if (!ctx) {
@@ -260,6 +316,14 @@ const Sound = (() => {
   // --- Musique de tension (boucle sourde pendant la réflexion) ---
   function startTension() {
     stopTension();
+    // Fichier « suspense » : redémarre depuis le début à chaque question
+    if (hasFile("suspense")) {
+      const a = music.suspense;
+      try { a.currentTime = 0; } catch (e) { /* ignoré */ }
+      const p = a.play();
+      if (p && p.catch) p.catch(() => { /* lecture bloquée : ignoré */ });
+      return;
+    }
     if (!ctx) return;
     tensionStep = 0;
     const bass = [55, 55, 65.41, 58.27];
@@ -278,6 +342,27 @@ const Sound = (() => {
     if (tensionId) {
       clearInterval(tensionId);
       tensionId = null;
+    }
+    if (music.suspense && !music.suspense.paused) {
+      music.suspense.pause();
+    }
+  }
+
+  /** Pause / reprise (joker « Public ») sans repartir du début. */
+  function pauseTension() {
+    if (hasFile("suspense")) {
+      music.suspense.pause();
+    } else {
+      stopTension();
+    }
+  }
+
+  function resumeTension() {
+    if (hasFile("suspense")) {
+      const p = music.suspense.play();
+      if (p && p.catch) p.catch(() => { /* ignoré */ });
+    } else {
+      startTension();
     }
   }
 
@@ -361,6 +446,9 @@ const Sound = (() => {
   function setMuted(value) {
     muted = value;
     if (master) master.gain.value = muted ? 0 : 0.7;
+    Object.keys(music).forEach(name => {
+      if (music[name]) music[name].muted = muted;
+    });
   }
 
   function toggleMute() {
@@ -373,7 +461,8 @@ const Sound = (() => {
   }
 
   return {
-    unlock, startTension, stopTension, intro, questionIn, select, lock,
+    unlock, startTension, stopTension, pauseTension, resumeTension,
+    playIntro, stopIntro, hasFile, intro, questionIn, select, lock,
     correct, wrong, tick, lifeline, prize, win, lose, toggleMute, isMuted
   };
 })();
@@ -484,6 +573,32 @@ function initApp() {
   let savedLang = "fr";
   try { savedLang = localStorage.getItem("quizLang") || "fr"; } catch (e) { /* ignoré */ }
   applyLanguage(savedLang);
+
+  startHomeMusic();
+}
+
+/**
+ * Musique de l'écran d'accueil. Les navigateurs bloquent souvent le son
+ * automatique : si c'est le cas, le générique démarre dès la première
+ * interaction (clic, toucher ou touche) sur la page.
+ */
+function startHomeMusic() {
+  Sound.playIntro().then(started => {
+    if (started) return;
+
+    const events = ["pointerdown", "keydown"];
+    const cleanup = () => events.forEach(ev => document.removeEventListener(ev, retry));
+    function retry(e) {
+      if (!screenStart.classList.contains("active")) {
+        cleanup();
+        return;
+      }
+      // Le bouton COMMENCER lance directement la partie
+      if (e.target && e.target.closest && e.target.closest("#btn-start")) return;
+      Sound.playIntro().then(ok => { if (ok) cleanup(); });
+    }
+    events.forEach(ev => document.addEventListener(ev, retry));
+  });
 }
 
 /**
@@ -536,7 +651,11 @@ function attachEventListeners() {
   // Navigation générale (le clic débloque aussi le son du navigateur)
   btnStart.addEventListener("click", () => {
     Sound.unlock();
-    Sound.intro();
+    if (Sound.hasFile("intro")) {
+      Sound.stopIntro(500);   // coupe le générique de l'accueil
+    } else {
+      Sound.intro();          // son de remplacement si le fichier est absent
+    }
     startGame();
   });
   btnRestart.addEventListener("click", () => {
@@ -985,6 +1104,7 @@ function useAudience() {
   }
 
   stopTimer(); // pause du chronomètre
+  Sound.pauseTension();
   Sound.lifeline();
   renderAudienceChart(percentages, correctIdx);
   audienceModal.classList.remove("hidden");
@@ -998,6 +1118,7 @@ function closeAudience() {
   audienceModal.classList.add("hidden");
   if (screenGame.classList.contains("active") && !isValidated) {
     resumeTimer();
+    Sound.resumeTension();
   }
 }
 
