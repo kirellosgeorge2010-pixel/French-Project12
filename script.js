@@ -197,8 +197,8 @@ const Sound = (() => {
   // --- Fichiers audio (placer les .mp3 dans le dossier « sounds/ ») ---
   // Si un fichier est absent, le jeu utilise automatiquement un son synthétisé.
   const AUDIO_FILES = {
-    intro: "sounds/intro.mp3",       // générique, joué sur l'écran d'accueil
-    suspense: "sounds/suspense.mp3"  // suspense, rejoué à chaque question
+    intro: "مقدمة من سيربح المليون 2.mp3",       // générique, joué sur l'écran d'accueil
+    suspense: "Who Wants to be a Millionaire Suspense - Sound Effect (HD).mp3"  // suspense, rejoué à chaque question
   };
   const AUDIO_VOLUME = { intro: 1.0, suspense: 0.8 };
   const music = { intro: null, suspense: null };
