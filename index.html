@@ -8,7 +8,7 @@
 </head>
 <body>
   <!-- Fond de scène et projecteurs -->
-  <div class="stage-background">
+  <div class="stage-background" id="stage-background">
     <div class="spotlight spotlight-left"></div>
     <div class="spotlight spotlight-right"></div>
     <div class="stage-glow"></div>
@@ -20,45 +20,68 @@
     <!-- ========================================== -->
     <section id="start-screen" class="screen active">
       <div class="start-card">
+        <!-- Barre d'outils : langue + son -->
+        <div class="start-toolbar">
+          <span class="lang-label" data-i18n="langLabel">Langue</span>
+          <div class="lang-switch" role="group" aria-label="Language">
+            <button class="lang-btn active" data-lang="fr" type="button">Français</button>
+            <button class="lang-btn" data-lang="en" type="button">English</button>
+            <button class="lang-btn" data-lang="ar" type="button">العربية</button>
+          </div>
+          <button class="sound-toggle" type="button" data-i18n-title="soundTitle" title="Son">🔊</button>
+        </div>
+
         <div class="logo-container">
           <img src="logo.png" alt="Logo Le Million Quiz" class="main-logo">
         </div>
-        <h1 class="main-title">QUI VEUT GAGNER DES MILLIONS ?</h1>
-        <p class="start-subtitle">15 questions vers le million d'euros. Êtes-vous prêt ?</p>
-        <button id="btn-start" class="glow-button">COMMENCER</button>
+        <h1 class="main-title" data-i18n="mainTitle">QUI VEUT GAGNER DES MILLIONS ?</h1>
+        <p class="start-subtitle" data-i18n="startSubtitle">15 questions vers le million d'euros. Êtes-vous prêt ?</p>
+        <button id="btn-start" class="glow-button" data-i18n="btnStart">COMMENCER</button>
       </div>
     </section>
 
     <!-- ========================================== -->
-    <!-- ÉCRAN DE JEU                               -->
+    <!-- ÉCRAN DE JEU (plein écran)                 -->
     <!-- ========================================== -->
     <section id="game-screen" class="screen">
-      <!-- En-tête : logo miniature, compteur, jokers -->
+      <!-- En-tête : logo miniature, compteur, chronomètre, jokers -->
       <header class="game-header">
         <div class="header-branding">
           <img src="logo.png" alt="Logo" class="mini-logo">
-          <span id="question-progress" class="question-progress">Question 1 / 15</span>
+          <div class="header-info">
+            <span id="question-progress" class="question-progress">Question 1 / 15</span>
+            <span id="question-prize" class="question-prize">Pour 100 €</span>
+          </div>
         </div>
 
-        <!-- Jokers -->
+        <!-- Chronomètre 20 secondes -->
+        <div class="timer" id="timer" aria-live="off">
+          <svg viewBox="0 0 100 100" aria-hidden="true">
+            <circle class="timer-bg" cx="50" cy="50" r="44"></circle>
+            <circle class="timer-fg" id="timer-fg" cx="50" cy="50" r="44"></circle>
+          </svg>
+          <span class="timer-text" id="timer-text">20</span>
+        </div>
+
+        <!-- Jokers + son -->
         <div class="lifelines-container" aria-label="Jokers">
-          <button id="lifeline-5050" class="lifeline-btn" title="50:50 (Supprime deux mauvaises réponses)">
-            <span class="lifeline-label">50:50</span>
+          <button id="lifeline-5050" class="lifeline-btn" data-i18n-title="lifeline5050Title" title="50:50 (Supprime deux mauvaises réponses)">
+            <span class="lifeline-label" data-i18n="label5050">50:50</span>
           </button>
-          <button id="lifeline-audience" class="lifeline-btn" title="Question au public">
-            <span class="lifeline-label">Public</span>
+          <button id="lifeline-audience" class="lifeline-btn" data-i18n-title="lifelineAudienceTitle" title="Question au public">
+            <span class="lifeline-label" data-i18n="labelAudience">Public</span>
           </button>
-          <button id="lifeline-swap" class="lifeline-btn" title="Changer de question">
-            <span class="lifeline-label">Changer</span>
+          <button id="lifeline-swap" class="lifeline-btn" data-i18n-title="lifelineSwapTitle" title="Changer de question">
+            <span class="lifeline-label" data-i18n="labelSwap">Changer</span>
           </button>
+          <button class="sound-toggle small" type="button" data-i18n-title="soundTitle" title="Son">🔊</button>
         </div>
       </header>
 
-      <!-- Corps du jeu : Arène des questions + Pyramide des gains -->
+      <!-- Corps du jeu : la question occupe tout l'écran -->
       <div class="game-body">
-        <!-- Arène des questions -->
-        <main class="quiz-arena">
-          <!-- Bannière horizontale de la question -->
+        <main class="quiz-arena" id="quiz-arena">
+          <!-- Bannière de la question -->
           <div class="hexagon-wrapper question-wrapper">
             <div class="hexagon-outer question-box">
               <div class="hexagon-inner question-content">
@@ -100,30 +123,18 @@
 
           <!-- Zone de validation et messages -->
           <div class="action-bar">
-            <!-- Bouton Valider -->
-            <button id="btn-validate" class="action-btn validate-btn" disabled>
+            <button id="btn-validate" class="action-btn validate-btn" data-i18n="validate" disabled>
               Valider
             </button>
 
-            <!-- Résultat et bouton suivant -->
             <div id="result-box" class="result-box hidden">
               <span id="result-message" class="result-message"></span>
               <button id="btn-next" class="action-btn next-btn">
-                Question suivante →
+                Voir mes gains →
               </button>
             </div>
           </div>
         </main>
-
-        <!-- Échelle / Pyramide des gains -->
-        <aside class="prize-ladder-aside" id="prize-ladder-aside">
-          <div class="prize-ladder-card">
-            <h2 class="ladder-title">ÉCHELLE DES GAINS</h2>
-            <ul class="ladder-list" id="ladder-list">
-              <!-- Rempli dynamiquement en JavaScript de 15 à 1 -->
-            </ul>
-          </div>
-        </aside>
       </div>
     </section>
 
@@ -140,35 +151,56 @@
 
         <div class="end-stats">
           <div class="stat-item highlight">
-            <span class="stat-label">Gain final remporté</span>
+            <span class="stat-label" data-i18n="finalPrize">Gain final remporté</span>
             <span id="end-prize" class="stat-value">1 000 000 €</span>
           </div>
           <div class="stat-item">
-            <span class="stat-label">Bonnes réponses</span>
+            <span class="stat-label" data-i18n="correctAnswers">Bonnes réponses</span>
             <span id="end-score" class="stat-value">15 / 15</span>
           </div>
         </div>
 
-        <button id="btn-restart" class="glow-button">Rejouer</button>
+        <button id="btn-restart" class="glow-button" data-i18n="replay">Rejouer</button>
       </div>
     </section>
+
+    <!-- ========================================== -->
+    <!-- ÉCRAN DES GAINS (affiché APRÈS la réponse)  -->
+    <!-- ========================================== -->
+    <div id="score-modal" class="modal-backdrop hidden" role="dialog" aria-modal="true" aria-labelledby="ladder-title">
+      <div class="modal-card score-card">
+        <p class="won-label" data-i18n="youWon">Vous avez gagné</p>
+        <p id="won-amount" class="won-amount">100 €</p>
+        <p id="milestone-note" class="milestone-note hidden" data-i18n="milestone">Palier garanti !</p>
+
+        <h2 id="ladder-title" class="ladder-title" data-i18n="ladderTitle">ÉCHELLE DES GAINS</h2>
+        <ul class="ladder-list" id="ladder-list">
+          <!-- Rempli dynamiquement en JavaScript de 15 à 1 -->
+        </ul>
+
+        <button id="btn-continue" class="action-btn next-btn continue-btn">Question suivante →</button>
+      </div>
+    </div>
 
     <!-- ========================================== -->
     <!-- MODALE JOKER : AVIS DU PUBLIC             -->
     <!-- ========================================== -->
     <div id="audience-modal" class="modal-backdrop hidden" role="dialog" aria-modal="true" aria-labelledby="audience-title">
       <div class="modal-card">
-        <h3 id="audience-title" class="modal-title">Vote du Public</h3>
-        <p class="modal-description">Voici la répartition des votes des spectateurs en plateau :</p>
-        
+        <h3 id="audience-title" class="modal-title" data-i18n="audienceTitle">Vote du Public</h3>
+        <p class="modal-description" data-i18n="audienceDesc">Voici la répartition des votes des spectateurs en plateau :</p>
+
         <div class="audience-chart" id="audience-chart">
           <!-- Généré dynamiquement en JS avec A, B, C, D et barres animées -->
         </div>
 
-        <button id="btn-close-audience" class="modal-btn">Fermer</button>
+        <button id="btn-close-audience" class="modal-btn" data-i18n="close">Fermer</button>
       </div>
     </div>
   </div>
+
+  <!-- Confettis -->
+  <div id="confetti" class="confetti-layer" aria-hidden="true"></div>
 
   <!-- Scripts -->
   <script src="questions.js"></script>
